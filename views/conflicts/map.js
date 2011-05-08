@@ -2,8 +2,10 @@ function(doc) {
   if(doc._conflicts) {
 
     function emit_rev(rev) {
-      var value = 1; // The fast built-in _sum reduction will result in a count of conflicted revisions.
       var key = [doc._id, rev];
+
+      // Create a value that will pull the correct revision when ?include_docs=true is specified.
+      var value = { "_id": doc._id, "_rev": rev };
 
       emit(key, value);
     }
