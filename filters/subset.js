@@ -5,22 +5,37 @@ function(doc, req) {
   if(/^_design\//.test(doc._id))
     return true;
 
-  if(doc._deleted) {
-    log("Deleted document: " + JSON.stringify(doc));
+  if(doc._deleted)
     return true;
-  }
 
-  if(!req.query.p)
-    throw new Error("Must supply a 'p' parameter with the fraction of documents to pass [0.0-1.0]");
-  
-  var p = parseFloat(req.query.p);
-  if(!(p >= 0.0 && p <= 1.0)) // Also catches NaN
-    throw new Error("Must supply a 'p' parameter with the fraction of documents to pass [0.0-1.0]");
+  var p;
+
+  if(req.query.p) {
+    p = parseFloat(req.query.p);
+    if(!(p >= 0.0 && p <= 1.0)) // Also catches NaN
+      throw new Error("Parameter 'p' must be fraction of documents to pass [0.0-1.0]");
+  }
+  else if(req.query.expect || req.query.e) {
+    // Set the fraction to that which will produce the expected document count.
+    p = parseInt(req.query.expect || req.query.e);
+    if(!(p <= 0) && !(p >= 0)) // NaN
+      throw new Error("Parameter 'e' must be fraction of documents to pass [0.0-1.0]");
+
+    p = Math.floor(p);
+    if(p > req.info.doc_count)
+      throw new Error("DB has " + req.info.doc_count + " docs, not expected " + p);
+
+    // Set it to the needed percentage.
+    p = p / req.info.doc_count;
+  }
+  else
+    throw new Error("Required 'p' parameter (fraction [0.0-1.0]) or 'expect' parameter (desired doc count)");
 
   // Consider the first 8 characters of the doc checksum (for now, taken from _rev) as a real number
   // on the range [0.0, 1.0), i.e. ["00000000", "ffffffff"].
-  var ONE = 4294967295; // parseInt("ffffffff", 16);
   var doc_val = parseInt(doc._rev.match(/^\d+-([0-9a-f]{8})/)[1], 16);
 
+  var ONE = 4294967295; // parseInt("ffffffff", 16);
+  log({doc_val:doc_val, p:p, ONE:ONE, normalized:(ONE * p), result:(doc_val < (ONE*p)) });
   return doc_val <= (ONE * p);
 }
