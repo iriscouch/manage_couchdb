@@ -33,9 +33,15 @@ function(doc, req) {
 
   // Consider the first 8 characters of the doc checksum (for now, taken from _rev) as a real number
   // on the range [0.0, 1.0), i.e. ["00000000", "ffffffff"].
-  var doc_val = parseInt(doc._rev.match(/^\d+-([0-9a-f]{8})/)[1], 16);
+  var doc_key = req.query.key || '_rev';
+  var doc_val = doc[doc_key];
+  var hex_re  = req.query.re || (doc_key === '_rev' ? /^\d+-([0-9a-f]{8})/ : /^([0-9a-f]{8})/);
+
+  if(typeof hex_re === 'string')
+    hex_re = new RegExp(hex_re);
+
+  doc_val = parseInt(hex_re.exec(doc_val)[1], 16);
 
   var ONE = 4294967295; // parseInt("ffffffff", 16);
-  log({doc_val:doc_val, p:p, ONE:ONE, normalized:(ONE * p), result:(doc_val < (ONE*p)) });
   return doc_val <= (ONE * p);
 }
