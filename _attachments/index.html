@@ -1,0 +1,38 @@
+<!DOCTYPE 'html'>
+<html>
+  <head>
+   <title>Testing CORS</title>
+  </head>
+  <body>
+    <h1>CORS</h1>
+    <p id="x">
+      Loading...
+    </p>
+    <script src="jquery.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        function done(res) {
+          $('#x').html('Done: ' + JSON.stringify(res));
+        }
+
+        function err(err) {
+          $('#x').html('Error: ' + JSON.stringify(err));
+        }
+
+        var url = 'http://lh:5984/x/_design/couchdb/_show/cors';
+
+        var doc = {_id:""+Math.random(), created_at:new Date};
+        url = 'http://lh:5984/x/' + doc._id;
+
+        $('#x').html('Querying...');
+        $.ajax({ url: url
+               , type: 'PUT'
+               , dataType: 'json'
+               , data: doc
+               , success: done
+               , error  : err
+               });
+      })
+    </script>
+  </body>
+</html>
