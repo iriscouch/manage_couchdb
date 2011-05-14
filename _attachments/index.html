@@ -15,20 +15,23 @@
           $('#x').html('Done: ' + JSON.stringify(res));
         }
 
-        function err(err) {
-          $('#x').html('Error: ' + JSON.stringify(err));
+        function err(err, x, y) {
+          $('#x').html('Error: ' + JSON.stringify([err,x,y]));
         }
 
-        var url = 'http://lh:5984/x/_design/couchdb/_show/cors';
+        var url, foreign;
+        foreign = 'altie';
+        foreign = 'lh';
 
         var doc = {_id:""+Math.random(), created_at:new Date};
-        url = 'http://lh:5984/x/' + doc._id;
+        url = 'http://'+foreign+':5984/couch/' + doc._id;
 
         $('#x').html('Querying...');
         $.ajax({ url: url
                , type: 'PUT'
                , dataType: 'json'
-               , data: doc
+               , contentType: 'application/json'
+               , data: JSON.stringify(doc)
                , success: done
                , error  : err
                });
