@@ -1,0 +1,105 @@
+<!DOCTYPE 'html'>
+<html>
+  <head>
+   <title>Testing CORS</title>
+  </head>
+  <body>
+    <h1>CORS</h1>
+    <ol id="runs">
+    </ol>
+    <script src="jquery.js"></script>
+    <script src="jquery.request.js"></script>
+    <script>
+      $(document).ready(function() {
+        var console   = window.console || {};
+        console.log   = console.log || function() {};
+        console.error = console.log || function() {};
+        console.info  = console.log || function() {};
+
+        // Confirm CORS support.
+        if(! jQuery.support.cors )
+          throw new Error('No XHR CORS support');
+        }
+
+        var match = /^(\/.*?)(\/_design\/[^/]*)/.exec(window.location.pathname);
+        if(!match)
+          throw new Error('Cannot determine couch and ddoc');
+        
+        var foreign_host = (window.location.hostname === '127.0.0.1') ?
+                           'localhost' :
+                           '127.0.0.1';
+
+        var couch = window.location.protocol + '//' + foreign_host + ':' + window.location.port
+          , db    = couch + match[1]
+          , ddoc  = couch + match[1] + match[2]
+          ;
+
+        var tests =
+        [ function(doc) { return [ 'GET' , couch          ] }
+        , function(doc) { return [ 'GET' , couch+'/favicon.ico' ] }
+        , function(doc) { return [ 'PUT' , db+'/'+doc._id ] }
+        , function(doc) { return [ 'POST', db             ] }
+        , function(doc) { return [ 'GET' , ddoc           ] }
+        , function(doc) { return [ 'GET' , ddoc+'/_show/echo' ] }
+        , function(doc) { return [ 'PUT' , ddoc+'/_update/empty' ] }
+        , function(doc) { return [ 'GET' , ddoc+'/cors.html' ] }
+        ]
+
+        var run_count = 0;
+
+        function do_runs(runs) {
+          if(runs.length === 0)
+            return;
+
+          run_count += 1;
+          if(run_count >= 100)
+            return;
+
+          var run = runs[0]
+            , rest = runs.slice(1)
+            , doc = {_id:""+Math.random(), created_at:new Date}
+            , result = run(doc)
+            , method = result[0]
+            , url    = result[1]
+            ;
+
+          var li = $('<li></li>');
+          li.html(method + ' ' + url + ' <span class="state">Querying ...</span>');
+          $('#runs').append(li);
+
+          function on_err(xhr, state) {
+            if(xhr.responseText === ""
+            && xhr.status       === 0
+            && state            === "error"
+            ) {
+              li.find('.state').html("FAIL: maybe no CORS permission");
+            } else {
+              li.find('.state').html('FAIL: ' + JSON.stringify(xhr));
+            }
+
+            console.error("Run fail: %o", {xhr:xhr, state:state});
+            return do_runs(rest);
+          }
+
+          function on_ok() {
+            console.info("Run ok: " + run_count);
+            li.find('.state').html("ok");
+            return do_runs(rest);
+          }
+
+          $.ajax({ url: url
+                 , type: method
+                 , headers: { 'Destination': 'awesome' }
+                 //, dataType: 'json'
+                 , contentType: 'application/json'
+                 , data: JSON.stringify(doc)
+                 , success: on_ok
+                 , error  : on_err
+                 });
+        }
+
+        do_runs(tests);
+      })
+    </script>
+  </body>
+</html>
