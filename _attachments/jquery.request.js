@@ -1,1 +1,0 @@
-/Users/jhs/src/iris/request_jquery/jquery.request.js
