@@ -1,0 +1,9 @@
+[ { "description": "Ability to go to to root of a couch directly from a vhost"
+  , "from": "root/*"
+  , "to"  : "../../../*"
+  }
+, { "description": "Ability to go to to root of a couch directly from a vhost"
+  , "from": "root"
+  , "to"  : "../../.."
+  }
+]
