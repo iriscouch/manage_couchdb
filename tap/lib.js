@@ -2,6 +2,8 @@
 //
 
 module.exports = { 'test': test
+                 , 'couch': process.env.couch
+                 , 'db'   : process.env.couch + '/' + process.env.db
                  }
 
 var tap = require('tap')
@@ -10,11 +12,8 @@ var tap = require('tap')
 function test(description, callback) {
   var names = ['couchdb', 'ecouchdb']
   names.forEach(function(name) {
-    var id = '_design/'+name
-      , ddoc = process.env.couchdb + '/' + process.env.db + '/' + id
-
     tap.test(description+': '+name, function(t) {
-      callback(t, ddoc)
+      callback(t, name)
     })
   })
 }
