@@ -6,6 +6,7 @@
 , "engines": [ "node" ]
 , "dependencies" : { "kanso"   : "~0.2.1"
                    , "follow"  : "~0.7.2"
+                   , "request" : "~2.9.153"
                    }
 
 , "devDependencies": { "tap": "~0.2.4"
