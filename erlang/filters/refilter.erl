@@ -6,8 +6,8 @@
 %  , { <<"log">>   , true } % (optional)
 % ]}
 
-fun({Doc}, {Req}) -> ok
-    , {Query} = couch_util:get_value(<<"query">>, Req)
+fun({Doc}, {Req})
+    -> {Query} = couch_util:get_value(<<"query">>, Req)
 
     % Unfortunately, building a function for every execution (i.e. once per doc) imposes a steep
     % performance penalty. I tried the process dictionary to memoize it but that didn't help.
@@ -26,27 +26,27 @@ fun({Doc}, {Req}) -> ok
     %, Logger("Running: Id=~p\nReq=~p", [Id, Req])
 
     , case is_binary(Field) andalso is_binary(Regex)
-        of false -> ok
-            %, Logger("Invalid parameters: Field=~p Regex=~p", [Field, Regex])
-            , exit({invalid_query, <<"Required field and regex parameter">>})
-        ; true -> ok
-            %, Logger("Field=~p Regex=~p", [Field, Regex])
-            , case couch_util:get_value(Field, Doc)
-                of undefined -> ok
-                    %, Logger("Doc ~s has no field ~s", [Id, Field])
-                    , false
-                ; Non_bin when not is_binary(Non_bin) -> ok
-                    %, Logger("Doc ~s field ~s is not a string: ~p", [Id, Field, Non_bin])
-                    , false
-                ; Value -> ok
-                    %, Logger("Testing '~s' to '~s'", [Value, Regex])
-                    , case re:run(Value, Regex, [])
-                        of nomatch -> ok
-                            %, Logger("No match: ~s", [Id])
-                            , false
-                        ; _ -> ok
-                            %, Logger("Match: ~s", [Id])
-                            , true
+        of false ->
+            %Logger("Invalid parameters: Field=~p Regex=~p", [Field, Regex]),
+            exit({invalid_query, <<"Required field and regex parameter">>})
+        ; true ->
+            %Logger("Field=~p Regex=~p", [Field, Regex]),
+            case couch_util:get_value(Field, Doc)
+                of undefined ->
+                    %Logger("Doc ~s has no field ~s", [Id, Field]),
+                    false
+                ; Non_bin when not is_binary(Non_bin) ->
+                    %Logger("Doc ~s field ~s is not a string: ~p", [Id, Field, Non_bin]),
+                    false
+                ; Value ->
+                    %Logger("Testing '~s' to '~s'", [Value, Regex]),
+                    case re:run(Value, Regex, [])
+                        of nomatch ->
+                            %Logger("No match: ~s", [Id]),
+                            false
+                        ; _ ->
+                            %Logger("Match: ~s", [Id]),
+                            true
                         end
                 end
         end
