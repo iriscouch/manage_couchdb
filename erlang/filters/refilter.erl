@@ -7,18 +7,18 @@
 % ]}
 
 fun({Doc}, {Req}) -> ok
-    , Log = fun(A,B) -> io:format(A, B), io:format("\n") end
     , Id = couch_util:get_value(<<"_id">>, Doc)
     , {Query} = couch_util:get_value(<<"query">>, Req)
     , L = case couch_util:get_value(<<"log">>, Query)
-        of true -> fun(F, A) -> Log(lists:flatten(io_lib:format(F, A))) end
-        ; _     -> fun(_F, _A) -> ok end
+        of true      -> fun(F, A) -> Log(lists:flatten(io_lib:format(F, A))) end
+        ; <<"true">> -> fun(F, A) -> Log(lists:flatten(io_lib:format(F, A))) end
+        ; _          -> fun(_F, _A) -> ok end
         end
 
     , Field = couch_util:get_value(<<"field">>, Query)
     , Regex = couch_util:get_value(<<"regex">>, Query)
+    , L("Running: Id=~p\nReq=~p", [Id, Req])
 
-    , L("Running: Id=~p Req=~p", [Id, Req])
     , case is_binary(Field) andalso is_binary(Regex)
         of false -> ok
             , L("Invalid parameters: Field=~p Regex=~p", [Field, Regex])
@@ -33,7 +33,7 @@ fun({Doc}, {Req}) -> ok
                     , L("Doc ~s field ~s is not a string: ~p", [Id, Field, Non_bin])
                     , false
                 ; Value -> ok
-                    , L("Testing '~s' =~ '~s'", [Value, Regex])
+                    , L("Testing '~s' to '~s'", [Value, Regex])
                     , {ok, Pattern} = re:compile(Regex)
                     , case re:run(Value, Pattern, [])
                         of nomatch -> ok
