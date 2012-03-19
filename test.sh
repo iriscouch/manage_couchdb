@@ -27,7 +27,7 @@ if [ -z "$skip" ]; then
   curl --fail --silent -XPUT "$couch/$db"
 
   kanso push "js" "$couch/$db"
-  kanso push "erlang" "$couch/db"
+  kanso push "erlang" "$couch/$db"
 fi
 
 export couch
