@@ -8,15 +8,12 @@ var util = require('util')
 var request = require('request')
 
 test('Refilter', function(t, type) {
-  if(type != 'ecouchdb')
-    return t.end() // XXX
+  t.plan(5)
 
   var rnd = Math.random().toString().replace(/^0\./, '')
   var docs = []
   for(var i = 1; i <= 100; i++)
     docs.push({'type':type, 'run':[type, rnd, i].join('_')})
-
-  t.plan(5)
 
   request.post({'url':lib.db+'/_bulk_docs', 'json':{'docs':docs}}, function(er, res) {
     if(er)
