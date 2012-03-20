@@ -14,6 +14,14 @@ Hit `.../_view/conflicts` to see all conflicts in the database.
 * Use `?reduce=false` to get one row per `[id,revision]` pair.
 * Use `?reduce=false&include_docs=true` to get every conflicted revision in one big batch.
 
+## Some useful rewrites
+
+Manage CouchDB includes some simple rewrites if you want to build from it.
+
+* `/_rewrite/_couchdb` hits the root CouchDB API
+* `/_rewrite/_db` hits the current database
+* `/_rewrite/_ddoc` hits the manage_couchdb design document itself
+
 ## An easy-to-use validation function
 
 To make a database read-only, edit this design document (e.g. `_design/couchdb`), and set `.access.read_only` = **true**.
