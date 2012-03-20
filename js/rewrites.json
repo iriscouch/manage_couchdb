@@ -1,9 +1,16 @@
-[ { "description": "Ability to go to to root of a couch directly from a vhost"
-  , "from": "root/*"
-  , "to"  : "../../../*"
+[ { "description": "Access to this database"
+  , "from": "_db"
+  , "to"  : "../.."
   }
-, { "description": "Ability to go to to root of a couch directly from a vhost"
-  , "from": "root"
+, { "from": "_db/*"
+  , "to"  : "../../*"
+  }
+
+, { "description": "Access to the main CouchDB API; requires _config/httpd/secure_rewrites = false"
+  , "from": "_couchdb"
   , "to"  : "../../.."
+  }
+, { "from": "_couchdb/*"
+  , "to"  : "../../../*"
   }
 ]
