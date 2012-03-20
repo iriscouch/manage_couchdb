@@ -53,13 +53,6 @@ To get *documents from June this year and last*, drop this document in the `_rep
 
 Manage CouchDB uses [node-tap][tap]. Start a CouchDB in Admin Party at `http://localhost:5984` and run the suite via the starter script. The script will do several things:
 
-1. Sanity-check that CouchDB is there
-1. Create a database for testing
-1. Deploy both implementations to CouchDB
-1. Run the TAP test suite
-
-Example:
-
     $ ./test.sh
     # Looking for CouchDB
     {"couchdb":"Welcome","version":"1.2.0"}
