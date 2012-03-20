@@ -11,7 +11,7 @@ test('Conflicts', function(t, type) {
   if(type == 'ecouchdb')
     return t.end() // XXX
 
-  t.plan(38)
+  t.plan(50)
 
   var conflicts = lib.db + '/_design/'+type + '/_view/conflicts'
   var rnd = Math.random().toString().replace(/^0\./, '')
@@ -83,6 +83,28 @@ test('Conflicts', function(t, type) {
         var row = matched_rows[0]
         t.equal(row.key.length, 1, 'Row key length is 1 (group level 1): '+doc._id)
         t.equal(row.value, 2, 'Row indicates two conflicting revisions: '+doc._id)
+      })
+
+      return test_include_docs()
+    })
+  }
+
+  function test_include_docs() {
+    request({'url':conflicts+'?reduce=false&include_docs=true', 'json':true}, function(er, res) {
+      if(er) throw er
+
+      docs.forEach(function(doc) {
+        var rows = res.body.rows.filter(function(row) { return row.key[0] == doc._id })
+
+        t.equal(rows.length, 2, 'Two rows for doc with ?include_docs: '+doc._id)
+        var doc1 = rows[0].doc
+          , doc2 = rows[1].doc
+
+        t.type(doc1, 'object', 'Got first revision with include_docs: '+doc._id)
+        t.type(doc2, 'object', 'Got second revision with include_docs: '+doc._id)
+
+        t.ok(doc1.value == doc2.value*2 || doc2.value == doc1.value*2,
+             'One doc value is twice the other with include_docs: '+doc._id)
       })
 
       t.end()
