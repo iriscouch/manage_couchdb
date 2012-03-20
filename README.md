@@ -96,10 +96,6 @@ Manage CouchDB uses [node-tap][tap]. Start a CouchDB in Admin Party at `http://l
 
     ok
 
-## Small print
-
-JavaScript and Erlang are not quite at parity at present. I am working on it though!
-
 ## License
 
 Manage CouchDB is released under the Apache license, version 2.
