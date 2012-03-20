@@ -8,7 +8,7 @@ Just drop it in your database (the id is `_design/couchdb` for JavaScript, and `
 
 ## A view of all conflicts
 
-Hit `.../_view/conflicts` to see all conflicts in the database.
+Hit `/_view/conflicts` to see all conflicts in the database.
 
 * Use `?group_level=1` to get a conflict count for each document
 * Use `?reduce=false` to get one row per `[id,revision]` pair.
@@ -22,7 +22,7 @@ Manage CouchDB includes some simple rewrites if you want to build from it.
 * `/_rewrite/_db` hits the current database
 * `/_rewrite/_ddoc` hits the manage_couchdb design document itself
 
-## An easy-to-use validation function
+## An easy validation function
 
 To make a database read-only, edit this design document (e.g. `_design/couchdb`), and set `.access.read_only` = **true**.
 
