@@ -35,5 +35,5 @@ export db
 if [ -f "$1" ]; then
   node "$1"
 else
-  tap ./tap
+  tap --stderr ./tap
 fi
