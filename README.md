@@ -1,4 +1,4 @@
-# Manage CouchDB: Common CouchDB management and maintenance tools
+# Manage CouchDB: Common management and maintenance
 
 Manage CouchDB is a Couch app ("design document") to do all the common stuff we all need.
 
@@ -8,11 +8,11 @@ Just drop it in your database (the id is `_design/couchdb` for JavaScript, and `
 
 ## A view of all conflicts
 
-Use `?group_level=1` to get a conflict count for each document
+Hit `.../_view/conflicts` to see all conflicts in the database.
 
-Use `?reduce=false` to get one row per `[id,revision]` pair.
-
-Use `?reduce=false&include_docs=true` to get every conflicted revision in one big batch.
+* Use `?group_level=1` to get a conflict count for each document
+* Use `?reduce=false` to get one row per `[id,revision]` pair.
+* Use `?reduce=false&include_docs=true` to get every conflicted revision in one big batch.
 
 ## An easy-to-use validation function
 
@@ -49,6 +49,54 @@ To get *documents from June this year and last*, drop this document in the `_rep
                       }
     }
 
+## Test suite
+
+Manage CouchDB uses [node-tap][tap]. Start a CouchDB in Admin Party at `http://localhost:5984` and run the suite via the starter script. The script will do several things:
+
+1. Sanity-check that CouchDB is there
+1. Create a database for testing
+1. Deploy both implementations to CouchDB
+1. Run the TAP test suite
+
+Example:
+
+    $ ./test.sh
+    # Looking for CouchDB
+    {"couchdb":"Welcome","version":"1.2.0"}
+
+    # Configuring CouchDB
+    "{couch_native_process, start_link, []}"
+    {"ok":true}
+    {"ok":true}
+
+    # Pushing JavaScript app
+    Reading dependency tree...
+    loading js
+    preprocessor traditional-couchapp/load
+    loading js/packages/traditional-couchapp
+    Build complete: 44ms
+    Uploading...
+    OK: http://localhost:5984/test_manage_couchdb/_design/couchdb/_rewrite/
+
+    # Pushing Erlang app
+    Reading dependency tree...
+    loading erlang
+    preprocessor traditional-couchapp/load
+    loading erlang/packages/traditional-couchapp
+    Build complete: 41ms
+    Uploading...
+    OK: http://localhost:5984/test_manage_couchdb/_design/ecouchdb
+
+    # Running TAP test suite
+    ok tap/conflicts.js ................................. 101/101
+    ok tap/lib.js ........................................... 3/3
+    ok tap/refilter.js ...................................... 6/6
+    total ............................................... 110/110
+
+    ok
+
 ## Small print
 
 JavaScript and Erlang are not quite at parity at present. I am working on it though!
+
+[tap]: https://github.com/isaacs/node-tap
