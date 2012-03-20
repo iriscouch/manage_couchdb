@@ -8,9 +8,6 @@ var util = require('util')
 var request = require('request')
 
 test('Conflicts', function(t, type) {
-  if(type == 'ecouchdb')
-    return t.end() // XXX
-
   t.plan(50)
 
   var conflicts = lib.db + '/_design/'+type + '/_view/conflicts'
