@@ -99,4 +99,8 @@ Example:
 
 JavaScript and Erlang are not quite at parity at present. I am working on it though!
 
+## License
+
+Manage CouchDB is released under the Apache license, version 2.
+
 [tap]: https://github.com/isaacs/node-tap
