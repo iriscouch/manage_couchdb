@@ -9,8 +9,14 @@
 function(doc, req) {
   var field = req.query.field
     , regex = req.query.regex
+    , is_ddocs = (req.query.ddocs == 'true' || req.query.ddocs == true)
 
   logger('Running: id=%s req=%o', doc._id, req)
+
+  if(is_ddocs && doc._id.match(/^_design\//)) {
+    logger('Passing design doc: %s', doc._id)
+    return true
+  }
 
   // It seems like throw causes a 500 in CouchDB.
   if(typeof field != 'string') {

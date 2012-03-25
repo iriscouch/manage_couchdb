@@ -57,3 +57,35 @@ test('Refilter', function(t, type) {
     })
   })
 })
+
+test('Refilter with design docs', function(t, type) {
+  t.plan(4)
+
+  var feed = lib.db + '/_changes?include_docs=true&filter='+type+'/refilter&field=run&regex=^'+type
+  request({'url':feed, 'json':true}, function(er, res) {
+    if(er) throw er
+
+    var changes = res.body.results
+    t.ok(changes.length > 0, 'Got some changes through refilter: '+type)
+    t.equal(ddocs(changes).length, 0, 'Zero ddocs copied: '+type)
+
+    feed += '&ddocs=true'
+    request({'url':feed, 'json':true}, function(er, res) {
+      if(er) throw er
+
+      var changes = res.body.results
+      t.ok(changes.length > 0, 'Got some changes through refilter with ddocs=true: '+type)
+      t.equal(ddocs(changes).length, 2, 'Got couchdb and ecouchdb ddocs through refilter with ddocs=true: '+type)
+
+      t.end()
+    })
+  })
+
+  function ddocs(changes) {
+    return changes.filter(is_ddoc)
+
+    function is_ddoc(change) {
+      return !! change.id.match(/^_design\//)
+    }
+  }
+})

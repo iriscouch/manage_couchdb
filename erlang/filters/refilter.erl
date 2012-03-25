@@ -21,16 +21,15 @@ fun({Doc}, {Req})
 
     , Field = couch_util:get_value(<<"field">>, Query)
     , Regex = couch_util:get_value(<<"regex">>, Query)
-    %, Id = couch_util:get_value(<<"_id">>, Doc)
     %, Logger("Running: Id=~p\nReq=~p", [Id, Req])
 
     , case is_binary(Field) andalso is_binary(Regex)
         of false ->
             %Logger("Invalid parameters: Field=~p Regex=~p", [Field, Regex]),
             exit({invalid_query, <<"Required field and regex parameter">>})
-        ; true ->
+        ; true
             %Logger("Field=~p Regex=~p", [Field, Regex]),
-            case couch_util:get_value(Field, Doc)
+            -> Is_match = case couch_util:get_value(Field, Doc)
                 of undefined ->
                     %Logger("Doc ~s has no field ~s", [Id, Field]),
                     false
@@ -46,6 +45,19 @@ fun({Doc}, {Req})
                         ; _ ->
                             %Logger("Match: ~s", [Id]),
                             true
+                        end
+                end
+
+            % Matches of course pass. But if the match fails and ddocs are requested, pass any ddocs.
+            , case Is_match
+                of true -> true
+                ;  false
+                    -> Id = couch_util:get_value(<<"_id">>, Doc)
+                    , DDocs = couch_util:get_value(<<"ddocs">>, Query)
+                    , Is_ddocs = DDocs =:= true orelse DDocs =:= <<"true">>
+                    , case {Is_ddocs, Id}
+                        of {true, <<"_design/", _/binary>>} -> true
+                        ;  _                                -> false
                         end
                 end
         end
