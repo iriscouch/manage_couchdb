@@ -13,7 +13,6 @@ fun({Doc}, {Req})
     % performance penalty. I tried the process dictionary to memoize it but that didn't help.
     % So, uncomment this to activate logging. In the Javascript version, performance is secondary,
     % so it should support logging by default.
-
     %, Logger = case couch_util:get_value(<<"log">>, Query)
     %    of true      -> fun(F, A) -> Log(lists:flatten(io_lib:format(F, A))) end
     %    ; <<"true">> -> fun(F, A) -> Log(lists:flatten(io_lib:format(F, A))) end
