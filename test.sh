@@ -25,6 +25,7 @@ set -e
 if [ -z "$skip" ]; then
   echo "# Configuring CouchDB"
   curl --fail --silent -XPUT "$couch/_config/native_query_servers/erlang" -d '"{couch_native_process, start_link, []}"'
+  curl --fail --silent -XPUT "$couch/_config/httpd/secure_rewrites" -d '"false"'
 
   curl --silent -XDELETE "$couch/$db"
   curl --fail --silent -XPUT "$couch/$db"
