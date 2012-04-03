@@ -108,3 +108,52 @@ test('Conflicts', function(t, type) {
     })
   }
 })
+
+test('Design document conflicts', function(t, type) {
+  t.plan(9)
+
+  var bulk = lib.db + '/_bulk_docs'
+    , conflicts = lib.db + '/_design/'+type + '/_view/conflicts'
+
+  var id = '_design/conflicting_ddoc_'+type
+  var ddoc = {'_id':id, 'value':'one'}
+
+  request.post({'url':bulk, 'json':{'docs':[ddoc]}}, function(er, res) {
+    if(er) throw er
+
+    t.equal(res.statusCode, 201, 'Store the first ddoc revision: '+type)
+    t.equal(res.body[0].ok, true, 'Stored first ddoc revision: '+type)
+
+    ddoc.value = 'two'
+    request.post({'url':bulk, 'json':{'all_or_nothing':true, 'docs':[ddoc]}}, function(er, res) {
+      if(er) throw er
+
+      t.equal(res.statusCode, 201, 'Store the second doc batch: '+type)
+      t.equal(res.body[0].ok, true, 'Stored second ddoc revision: '+type)
+
+      // Look for the conflicts
+      request({'url':conflicts+'?reduce=false', 'json':true}, function(er, res) {
+        if(er) throw er
+        t.equal(res.statusCode, 200, 'Good response from conflicts view: '+type)
+
+        var id_hits = 0
+          , key_hits = 0
+
+        res.body.rows.forEach(function(row) {
+          if(row.id == id)
+            id_hits += 1
+
+          if(row.key[0] == id) {
+            key_hits += 1
+            t.ok(row.key[1].match(/^1-/), 'Conflicting ddoc is at revision 1: '+type)
+          }
+        })
+
+        t.equal(id_hits, 2, 'Found the conflicting ddoc id twice: '+type)
+        t.equal(key_hits, 2, 'Found the conflicting ddoc key twice: '+type)
+
+        t.end()
+      })
+    })
+  })
+})
