@@ -85,7 +85,7 @@ test('Refilter with design docs', function(t, type) {
     return changes.filter(is_ddoc)
 
     function is_ddoc(change) {
-      return !! change.id.match(/^_design\//)
+      return change.id == '_design/couchdb' || change.id == '_design/ecouchdb'
     }
   }
 })
