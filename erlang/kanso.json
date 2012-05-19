@@ -1,5 +1,5 @@
 { "name": "ecouchdb"
-, "version": "0.1.1"
+, "version": "0.1.2"
 , "description": "CouchDB development and management tools (Erlang)"
 , "dependencies": { "traditional-couchapp": "~0.1.0"
                   }
